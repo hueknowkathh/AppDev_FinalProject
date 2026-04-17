@@ -70,6 +70,8 @@ This project uses multiple emerging technologies in a way that is central to the
 2. Import `sql/wardrobe_db.sql`.
 3. Update `config/db.php` if your local database credentials are different.
 
+If you already have an older local database, add the new `updated_at` columns to `clothes` and `outfits`, and add the unique `(outfit_id, clothing_id)` constraint in `outfit_items` so recent edits and duplicate-prevention work correctly.
+
 ### 3. Python Dependencies
 
 Install the required Python packages:

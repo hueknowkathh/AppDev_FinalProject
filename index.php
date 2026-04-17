@@ -8,24 +8,24 @@ $totalOutfits = (int) $conn->query('SELECT COUNT(*) AS total FROM outfits')->fet
 $favorites = (int) $conn->query('SELECT COUNT(*) AS total FROM clothes WHERE favorite = 1')->fetch_assoc()['total'];
 $mostWorn = $conn->query("SELECT name, wear_count FROM clothes ORDER BY wear_count DESC, name ASC LIMIT 1")->fetch_assoc();
 $latestOutfit = $conn->query("
-    SELECT o.name, o.occasion, o.season, o.created_at, COUNT(oi.id) AS item_total
+    SELECT o.name, o.occasion, o.season, o.created_at, o.updated_at, COUNT(oi.id) AS item_total
     FROM outfits o
     LEFT JOIN outfit_items oi ON oi.outfit_id = o.id
-    GROUP BY o.id, o.name, o.occasion, o.season, o.created_at
-    ORDER BY o.created_at DESC, o.id DESC
+    GROUP BY o.id, o.name, o.occasion, o.season, o.created_at, o.updated_at
+    ORDER BY o.updated_at DESC, o.id DESC
     LIMIT 1
 ")->fetch_assoc();
 $signatureFavorite = $conn->query("
     SELECT name, category, color, occasion, last_worn
     FROM clothes
     WHERE favorite = 1
-    ORDER BY wear_count DESC, created_at DESC
+    ORDER BY wear_count DESC, updated_at DESC
     LIMIT 1
 ")->fetch_assoc();
 $recentPieces = $conn->query("
     SELECT name, category, color, occasion, wear_count, last_worn, favorite
     FROM clothes
-    ORDER BY created_at DESC, id DESC
+    ORDER BY updated_at DESC, id DESC
     LIMIT 6
 ")->fetch_all(MYSQLI_ASSOC);
 $dormantPieces = $conn->query("
@@ -64,7 +64,7 @@ $signatureLookMeta = $latestOutfit
     ? trim(($latestOutfit['occasion'] ?: 'Curated look') . (!empty($latestOutfit['season']) ? ' / ' . $latestOutfit['season'] : ''))
     : trim(($signatureFavorite['category'] ?? 'Featured piece') . (!empty($signatureFavorite['occasion']) ? ' / ' . $signatureFavorite['occasion'] : ''));
 $signatureLookSupport = $latestOutfit
-    ? (($latestOutfit['item_total'] ?? 0) . ' pieces curated / ' . date('M d, Y', strtotime($latestOutfit['created_at'])))
+    ? (($latestOutfit['item_total'] ?? 0) . ' pieces curated / ' . date('M d, Y', strtotime($latestOutfit['updated_at'] ?? $latestOutfit['created_at'])))
     : ($signatureFavorite ? (($signatureFavorite['color'] ?: 'Balanced palette') . ' / ' . ($signatureFavorite['last_worn'] ? 'Last styled ' . date('M d', strtotime($signatureFavorite['last_worn'])) : 'Ready for rotation')) : 'Save a look or mark a favorite to surface your lead edit.');
 
 $styleCategory = $topCategory['category'] ?? 'Curated essentials';

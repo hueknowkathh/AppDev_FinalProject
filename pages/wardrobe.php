@@ -39,7 +39,7 @@ if ($season !== '') {
     $types .= 's';
 }
 
-$sql .= ' ORDER BY created_at DESC, id DESC';
+$sql .= ' ORDER BY updated_at DESC, id DESC';
 $stmt = $conn->prepare($sql);
 if ($params !== []) {
     $stmt->bind_param($types, ...$params);
@@ -48,11 +48,11 @@ $stmt->execute();
 $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 $savedOutfits = $conn->query(" 
-    SELECT o.id, o.name, o.occasion, o.season, o.created_at, COUNT(oi.id) AS item_total
+    SELECT o.id, o.name, o.occasion, o.season, o.created_at, o.updated_at, COUNT(oi.id) AS item_total
     FROM outfits o
     LEFT JOIN outfit_items oi ON oi.outfit_id = o.id
-    GROUP BY o.id, o.name, o.occasion, o.season, o.created_at
-    ORDER BY o.created_at DESC, o.id DESC
+    GROUP BY o.id, o.name, o.occasion, o.season, o.created_at, o.updated_at
+    ORDER BY o.updated_at DESC, o.id DESC
     LIMIT 6
 ")->fetch_all(MYSQLI_ASSOC);
 
@@ -501,7 +501,7 @@ require __DIR__ . '/../includes/header.php';
                         <div class="saved-fit-details">
                             <div class="saved-fit-detail-top">
                                 <span class="mini-label">Saved fit</span>
-                                <span class="saved-fit-date"><?= htmlspecialchars(date('M d, Y', strtotime($outfit['created_at']))) ?></span>
+                                <span class="saved-fit-date"><?= htmlspecialchars(date('M d, Y', strtotime($outfit['updated_at'] ?? $outfit['created_at']))) ?></span>
                             </div>
                             <h4><?= htmlspecialchars($outfit['name']) ?></h4>
                             <p class="saved-fit-subtitle mb-3"><?= htmlspecialchars($outfit['occasion'] ?: 'Open styling') ?><?= !empty($outfit['season']) ? ' / ' . htmlspecialchars($outfit['season']) : '' ?></p>
