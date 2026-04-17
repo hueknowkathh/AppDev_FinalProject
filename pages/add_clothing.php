@@ -61,7 +61,7 @@ require __DIR__ . '/../includes/header.php';
         </div>
         <div class="col-md-6">
             <label for="image" class="form-label">Image upload</label>
-            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
         </div>
         <div class="col-12">
             <label for="notes" class="form-label">Notes</label>

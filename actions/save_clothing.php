@@ -102,6 +102,18 @@ function detectColor(string $imageFullPath): ?string
     return $data['dominant_color'] ?? null;
 }
 
+function uploadErrorMessage(int $errorCode): string
+{
+    return match ($errorCode) {
+        UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'The uploaded image is too large.',
+        UPLOAD_ERR_PARTIAL => 'The image upload was incomplete. Please try again.',
+        UPLOAD_ERR_NO_TMP_DIR => 'Server upload temp folder is missing.',
+        UPLOAD_ERR_CANT_WRITE => 'The server could not write the uploaded image.',
+        UPLOAD_ERR_EXTENSION => 'The upload was blocked by a server extension.',
+        default => 'Image upload failed.',
+    };
+}
+
 $name = trim($_POST['name'] ?? '');
 $category = trim($_POST['category'] ?? '');
 $color = trim($_POST['color'] ?? '');
@@ -118,15 +130,29 @@ if ($name === '' || $category === '' || $season === '' || $occasion === '') {
     exit;
 }
 
+if (empty($_FILES['image']['name'])) {
+    $_SESSION['flash_message'] = 'Please upload an image for the item.';
+    $_SESSION['flash_type'] = 'danger';
+    header('Location: ../pages/wardrobe.php?open_add=1');
+    exit;
+}
+
 $relativePath = null;
 $absolutePath = null;
 $originalAbsolutePath = null;
+
+if (!empty($_FILES['image']['name']) && (int) $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+    $_SESSION['flash_message'] = uploadErrorMessage((int) $_FILES['image']['error']);
+    $_SESSION['flash_type'] = 'danger';
+    header('Location: ../pages/wardrobe.php?open_add=1');
+    exit;
+}
 
 if (!empty($_FILES['image']['name']) && (int) $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = realpath(__DIR__ . '/../assets/uploads');
     if ($uploadDir !== false) {
         $extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
         if (!in_array($extension, $allowed, true)) {
             $_SESSION['flash_message'] = 'Unsupported image format.';
             $_SESSION['flash_type'] = 'danger';
@@ -150,13 +176,17 @@ if (!empty($_FILES['image']['name']) && (int) $_FILES['image']['error'] === UPLO
         if ($cutout) {
             $absolutePath = $cutout['absolute'];
             $relativePath = $cutout['relative'];
-            if ($originalAbsolutePath && file_exists($originalAbsolutePath)) {
-                @unlink($originalAbsolutePath);
-            }
         } else {
             error_log('Closet Couture: using original uploaded image because cutout generation did not complete.');
         }
     }
+}
+
+if (!empty($_FILES['image']['name']) && $relativePath === null) {
+    $_SESSION['flash_message'] = 'Image upload failed.';
+    $_SESSION['flash_type'] = 'danger';
+    header('Location: ../pages/wardrobe.php?open_add=1');
+    exit;
 }
 
 if ($color === '' && $absolutePath) {

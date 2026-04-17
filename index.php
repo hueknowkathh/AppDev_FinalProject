@@ -62,10 +62,10 @@ $wearScore = max(12, min(98, $wearScore));
 $signatureLookTitle = $latestOutfit['name'] ?? ($signatureFavorite['name'] ?? 'Signature look pending');
 $signatureLookMeta = $latestOutfit
     ? trim(($latestOutfit['occasion'] ?: 'Curated look') . (!empty($latestOutfit['season']) ? ' / ' . $latestOutfit['season'] : ''))
-    : trim(($signatureFavorite['category'] ?? 'Favorite piece') . (!empty($signatureFavorite['occasion']) ? ' / ' . $signatureFavorite['occasion'] : ''));
+    : trim(($signatureFavorite['category'] ?? 'Featured piece') . (!empty($signatureFavorite['occasion']) ? ' / ' . $signatureFavorite['occasion'] : ''));
 $signatureLookSupport = $latestOutfit
-    ? (($latestOutfit['item_total'] ?? 0) . ' pieces composed / ' . date('M d, Y', strtotime($latestOutfit['created_at'])))
-    : ($signatureFavorite ? (($signatureFavorite['color'] ?: 'Refined palette') . ' / ' . ($signatureFavorite['last_worn'] ? 'Last styled ' . date('M d', strtotime($signatureFavorite['last_worn'])) : 'Ready to style')) : 'Save an outfit or mark a favorite to surface your signature edit.');
+    ? (($latestOutfit['item_total'] ?? 0) . ' pieces curated / ' . date('M d, Y', strtotime($latestOutfit['created_at'])))
+    : ($signatureFavorite ? (($signatureFavorite['color'] ?: 'Balanced palette') . ' / ' . ($signatureFavorite['last_worn'] ? 'Last styled ' . date('M d', strtotime($signatureFavorite['last_worn'])) : 'Ready for rotation')) : 'Save a look or mark a favorite to surface your lead edit.');
 
 $styleCategory = $topCategory['category'] ?? 'Curated essentials';
 $styleCategoryTotal = (int) ($topCategory['total'] ?? 0);
@@ -80,31 +80,31 @@ foreach ($dormantPieces as $piece) {
 }
 
 $aiInsight = $totalItems === 0
-    ? 'Begin with a few wardrobe pieces to unlock richer styling intelligence and signature outfit suggestions.'
-    : 'Your wardrobe leans ' . strtolower($styleCategory) . ' with a strong ' . strtolower($styleColor) . ' story. Build your next curated look around ' . strtolower($styleOccasion) . ' and reactivate ' . $dormantCount . ' dormant piece' . ($dormantCount === 1 ? '' : 's') . ' for a sharper rotation.';
+    ? 'Start with a few core pieces to unlock clearer styling insights and stronger outfit direction.'
+    : 'Your wardrobe is anchored in ' . strtolower($styleCategory) . ' with a defined ' . strtolower($styleColor) . ' palette. Focus your next look on ' . strtolower($styleOccasion) . ' dressing and bring back ' . $dormantCount . ' underused piece' . ($dormantCount === 1 ? '' : 's') . ' to improve rotation.';
 ?>
 
 <section class="hero-panel mb-4 mb-lg-5">
     <div class="row g-4 align-items-center">
         <div class="col-lg-7">
             <span class="eyebrow">Chrome atelier dashboard</span>
-            <h1 class="display-5 hero-title mt-2">Elevate your digital closet with sharper wardrobe intelligence and editorial polish.</h1>
-            <p class="hero-copy">Closet Couture organizes wardrobe pieces, reveals dormant luxury, and turns daily outfit planning into a premium fashion-tech ritual.</p>
+            <h1 class="display-5 hero-title mt-2">A sharper, more refined way to manage your wardrobe.</h1>
+            <p class="hero-copy">Track every piece, review outfit composition, and keep your closet organized with a cleaner styling workflow.</p>
             <div class="hero-chip-row mt-4">
-                <span>Wardrobe Pieces: <?= $totalItems ?></span>
-                <span>Curated Looks: <?= $totalOutfits ?></span>
-                <span>Signature Favorites: <?= $favorites ?></span>
+                <span>Pieces: <?= $totalItems ?></span>
+                <span>Looks: <?= $totalOutfits ?></span>
+                <span>Favorites: <?= $favorites ?></span>
             </div>
             <div class="d-flex flex-wrap gap-3 mt-4">
                 <a href="pages/wardrobe.php?open_add=1" class="btn btn-gold">Add New Piece</a>
-                <a href="pages/recommendation.php" class="btn btn-outline-dark hero-outline-btn">Open AI Styling</a>
+                <button type="button" class="btn btn-outline-dark hero-outline-btn" data-ai-stylist-open>Open AI Stylist</button>
             </div>
         </div>
         <div class="col-lg-5">
             <div class="feature-card hero-spotlight-card tall-card">
-                <span class="mini-label">Today's Signature Look</span>
+                <span class="mini-label">Signature Look</span>
                 <h3><?= htmlspecialchars($signatureLookTitle) ?></h3>
-                <p class="hero-spotlight-meta"><?= htmlspecialchars($signatureLookMeta ?: 'Refined wardrobe direction') ?></p>
+                <p class="hero-spotlight-meta"><?= htmlspecialchars($signatureLookMeta ?: 'Current wardrobe direction') ?></p>
                 <p class="text-muted mb-3"><?= htmlspecialchars($signatureLookSupport) ?></p>
                 <div class="spotlight-divider"></div>
                 <div class="spotlight-points">
@@ -160,15 +160,15 @@ $aiInsight = $totalItems === 0
 <section class="dashboard-section mb-4">
     <div class="section-heading dashboard-heading">
         <span class="eyebrow">Wardrobe intelligence</span>
-        <h2>Editorial signals from your current collection</h2>
-        <p class="text-muted mb-0">Sharper hierarchy, clearer styling prompts, and a luxury dashboard rhythm built around the wardrobe data you already track.</p>
+        <h2>Key signals from your current collection</h2>
+        <p class="text-muted mb-0">A clearer view of category strength, styling gaps, and the pieces shaping your wardrobe direction.</p>
     </div>
     <div class="row g-4">
         <div class="col-lg-4">
             <div class="feature-card dashboard-feature-card h-100">
                 <span class="mini-label">Style DNA</span>
                 <h3><?= htmlspecialchars($styleCategory) ?></h3>
-                <p class="text-muted">Your collection currently centers on <?= htmlspecialchars(strtolower($styleCategory)) ?> with a strong preference for <?= htmlspecialchars(strtolower($styleColor)) ?> and <?= htmlspecialchars(strtolower($styleOccasion)) ?> dressing.</p>
+                <p class="text-muted">Your wardrobe currently leans toward <?= htmlspecialchars(strtolower($styleCategory)) ?>, supported by a <?= htmlspecialchars(strtolower($styleColor)) ?> palette and a preference for <?= htmlspecialchars(strtolower($styleOccasion)) ?> dressing.</p>
                 <div class="dashboard-stat-stack">
                     <div class="dashboard-stat-chip">
                         <span>Lead category</span>
@@ -188,9 +188,9 @@ $aiInsight = $totalItems === 0
         <div class="col-lg-4">
             <div class="feature-card dashboard-feature-card h-100">
                 <span class="mini-label">Dormant Luxury</span>
-                <h3>Pieces waiting for their next appearance</h3>
+                <h3>Pieces due for a return</h3>
                 <?php if ($dormantPieces === []): ?>
-                    <p class="text-muted mb-0">No dormant wardrobe pieces yet.</p>
+                    <p class="text-muted mb-0">No inactive pieces identified yet.</p>
                 <?php else: ?>
                     <div class="dashboard-list">
                         <?php foreach ($dormantPieces as $piece): ?>
@@ -208,10 +208,10 @@ $aiInsight = $totalItems === 0
         </div>
         <div class="col-lg-4">
             <div class="feature-card dashboard-feature-card dashboard-insight-card h-100">
-                <span class="mini-label">AI Styling Insight</span>
-                <h3>What to refine next</h3>
+                <span class="mini-label">AI Stylist Insight</span>
+                <h3>Next refinement</h3>
                 <p class="mb-4"><?= htmlspecialchars($aiInsight) ?></p>
-                <a href="pages/recommendation.php" class="dashboard-inline-link">Generate a refined styling recommendation</a>
+                <button type="button" class="dashboard-inline-link dashboard-inline-button" data-ai-stylist-open>Chat with the AI stylist</button>
             </div>
         </div>
     </div>

@@ -339,7 +339,7 @@ def build_text_only_outfits(wardrobe, occasion, season, preferred_style, preferr
         if preferred_color or palette:
             summary_parts.append(f"Let {color_direction} guide the color story.")
         if missing_categories:
-            summary_parts.append(f"Complete it later with {missing_text}.")
+            summary_parts.append(f"Use your saved pieces as the base, then complete it with {missing_text} if those categories are still missing from your wardrobe.")
         elif partial_items:
             summary_parts.append("Use the suggested wardrobe pieces below to build the look immediately.")
 
@@ -350,6 +350,8 @@ def build_text_only_outfits(wardrobe, occasion, season, preferred_style, preferr
         ]
         if preferred_style:
             reasons.append(f"Follows your selected style direction: {preferred_style}.")
+        if missing_categories:
+            reasons.append("Adds outside-the-wardrobe suggestions only for the missing categories needed to complete the outfit.")
 
         outfits.append({
             "title": f"Option {index}: {concept_label}",
@@ -418,7 +420,7 @@ def build_text_wear_guide(focus_name, missing_categories, occasion, season, pref
     for index, category in enumerate(missing_categories[:3]):
         starter = ["Add", "Pair it with", "Finish with"][min(index, 2)]
         color_note = f" in {preferred_color.lower()}" if preferred_color else ""
-        lines.append(f"{starter} {category_phrase(category)}{color_note} to complete the look.")
+        lines.append(f"{starter} {category_phrase(category)}{color_note} from outside your current wardrobe to complete the look.")
 
     if preferred_style:
         lines.append(f"Keep the silhouette {preferred_style.lower()} rather than overly busy.")

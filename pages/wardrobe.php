@@ -77,6 +77,26 @@ function fitCategoryKey(string $category): string
     return strtolower(trim($category));
 }
 
+function summarizeFitLayout(array $items): array
+{
+    $totals = [];
+
+    foreach ($items as $item) {
+        $key = fitCategoryKey($item['category'] ?? '');
+        $totals[$key] = ($totals[$key] ?? 0) + 1;
+    }
+
+    return [
+        'itemTotal' => count($items),
+        'hasTop' => !empty($totals['top']),
+        'hasBottom' => !empty($totals['bottom']),
+        'hasDress' => !empty($totals['dress']),
+        'hasOuterwear' => !empty($totals['outerwear']),
+        'hasShoes' => !empty($totals['shoes']),
+        'hasAccessory' => !empty($totals['accessory']),
+    ];
+}
+
 function fitPieceClass(string $category): string
 {
     return match (fitCategoryKey($category)) {
@@ -90,47 +110,55 @@ function fitPieceClass(string $category): string
     };
 }
 
-function fitPieceStyle(string $category, int $categoryIndex, int $categoryTotal, int $globalIndex): string
+function fitPieceStyle(string $category, int $categoryIndex, int $categoryTotal, int $globalIndex, array $layoutContext): string
 {
+    $itemTotal = (int) ($layoutContext['itemTotal'] ?? 0);
+    $hasTop = !empty($layoutContext['hasTop']);
+    $hasBottom = !empty($layoutContext['hasBottom']);
+    $hasDress = !empty($layoutContext['hasDress']);
+    $hasOuterwear = !empty($layoutContext['hasOuterwear']);
+    $hasShoes = !empty($layoutContext['hasShoes']);
+    $hasAccessory = !empty($layoutContext['hasAccessory']);
+
     $layouts = match (fitCategoryKey($category)) {
         'top' => [
-            ['left' => '50%', 'top' => '12px', 'width' => '56%', 'height' => '42%', 'shiftX' => '-50%', 'z' => 4],
-            ['left' => '33%', 'top' => '22px', 'width' => '40%', 'height' => '31%', 'shiftX' => '-50%', 'rotate' => '-8deg', 'z' => 6],
-            ['left' => '67%', 'top' => '22px', 'width' => '40%', 'height' => '31%', 'shiftX' => '-50%', 'rotate' => '8deg', 'z' => 6],
-            ['left' => '50%', 'top' => '36px', 'width' => '35%', 'height' => '28%', 'shiftX' => '-50%', 'z' => 7],
+            ['left' => '50%', 'top' => $hasOuterwear ? '28px' : '12px', 'width' => $hasOuterwear ? '46%' : '58%', 'height' => $hasOuterwear ? '34%' : '40%', 'shiftX' => '-50%', 'z' => 5],
+            ['left' => '33%', 'top' => '22px', 'width' => '34%', 'height' => '28%', 'shiftX' => '-50%', 'rotate' => '-8deg', 'z' => 7],
+            ['left' => '67%', 'top' => '22px', 'width' => '34%', 'height' => '28%', 'shiftX' => '-50%', 'rotate' => '8deg', 'z' => 7],
+            ['left' => '50%', 'top' => '36px', 'width' => '30%', 'height' => '24%', 'shiftX' => '-50%', 'z' => 8],
         ],
         'outerwear' => [
-            ['left' => '50%', 'top' => '8px', 'width' => '62%', 'height' => '45%', 'shiftX' => '-50%', 'z' => 2],
-            ['left' => '28%', 'top' => '18px', 'width' => '42%', 'height' => '33%', 'shiftX' => '-50%', 'rotate' => '-10deg', 'z' => 5],
-            ['left' => '72%', 'top' => '18px', 'width' => '42%', 'height' => '33%', 'shiftX' => '-50%', 'rotate' => '10deg', 'z' => 5],
+            ['left' => '50%', 'top' => '4px', 'width' => $hasDress ? '56%' : '66%', 'height' => $hasDress ? '38%' : '44%', 'shiftX' => '-50%', 'z' => 3],
+            ['left' => '30%', 'top' => '14px', 'width' => '38%', 'height' => '30%', 'shiftX' => '-50%', 'rotate' => '-10deg', 'z' => 4],
+            ['left' => '70%', 'top' => '14px', 'width' => '38%', 'height' => '30%', 'shiftX' => '-50%', 'rotate' => '10deg', 'z' => 4],
         ],
         'dress' => [
-            ['left' => '50%', 'top' => '10px', 'width' => '54%', 'height' => '72%', 'shiftX' => '-50%', 'z' => 4],
-            ['left' => '34%', 'top' => '26px', 'width' => '40%', 'height' => '56%', 'shiftX' => '-50%', 'rotate' => '-7deg', 'z' => 6],
-            ['left' => '66%', 'top' => '26px', 'width' => '40%', 'height' => '56%', 'shiftX' => '-50%', 'rotate' => '7deg', 'z' => 6],
+            ['left' => '50%', 'top' => $hasShoes ? '10px' : '16px', 'width' => '52%', 'height' => $hasShoes ? '68%' : '74%', 'shiftX' => '-50%', 'z' => 4],
+            ['left' => '34%', 'top' => '24px', 'width' => '36%', 'height' => '54%', 'shiftX' => '-50%', 'rotate' => '-7deg', 'z' => 6],
+            ['left' => '66%', 'top' => '24px', 'width' => '36%', 'height' => '54%', 'shiftX' => '-50%', 'rotate' => '7deg', 'z' => 6],
         ],
         'bottom' => [
-            ['left' => '52%', 'bottom' => '10px', 'width' => '48%', 'height' => '52%', 'shiftX' => '-50%', 'z' => 3],
-            ['left' => '34%', 'bottom' => '14px', 'width' => '36%', 'height' => '42%', 'shiftX' => '-50%', 'rotate' => '-6deg', 'z' => 5],
-            ['left' => '70%', 'bottom' => '14px', 'width' => '36%', 'height' => '42%', 'shiftX' => '-50%', 'rotate' => '6deg', 'z' => 5],
+            ['left' => '50%', 'bottom' => $hasShoes ? '18px' : '10px', 'width' => $hasAccessory ? '44%' : '48%', 'height' => $hasShoes ? '46%' : '52%', 'shiftX' => '-50%', 'z' => 4],
+            ['left' => '34%', 'bottom' => '18px', 'width' => '34%', 'height' => '36%', 'shiftX' => '-50%', 'rotate' => '-6deg', 'z' => 6],
+            ['left' => '70%', 'bottom' => '18px', 'width' => '34%', 'height' => '36%', 'shiftX' => '-50%', 'rotate' => '6deg', 'z' => 6],
         ],
         'shoes' => [
-            ['left' => '28%', 'bottom' => '10px', 'width' => '24%', 'height' => '16%', 'shiftX' => '-50%', 'rotate' => '-8deg', 'z' => 7],
-            ['left' => '72%', 'bottom' => '10px', 'width' => '24%', 'height' => '16%', 'shiftX' => '-50%', 'rotate' => '8deg', 'z' => 7],
-            ['left' => '43%', 'bottom' => '26px', 'width' => '22%', 'height' => '14%', 'shiftX' => '-50%', 'rotate' => '-4deg', 'z' => 8],
-            ['left' => '57%', 'bottom' => '26px', 'width' => '22%', 'height' => '14%', 'shiftX' => '-50%', 'rotate' => '4deg', 'z' => 8],
+            ['left' => $hasBottom ? '24%' : '50%', 'bottom' => '6px', 'width' => $hasBottom ? '30%' : '38%', 'height' => $hasBottom ? '18%' : '22%', 'shiftX' => '-50%', 'rotate' => '-7deg', 'z' => 8],
+            ['left' => '76%', 'bottom' => '6px', 'width' => '30%', 'height' => '18%', 'shiftX' => '-50%', 'rotate' => '7deg', 'z' => 8],
+            ['left' => '38%', 'bottom' => '24px', 'width' => '24%', 'height' => '15%', 'shiftX' => '-50%', 'rotate' => '-4deg', 'z' => 9],
+            ['left' => '62%', 'bottom' => '24px', 'width' => '24%', 'height' => '15%', 'shiftX' => '-50%', 'rotate' => '4deg', 'z' => 9],
         ],
         'accessory' => [
-            ['left' => '14px', 'top' => '16px', 'width' => '22%', 'height' => '18%', 'z' => 8],
-            ['right' => '14px', 'top' => '16px', 'width' => '22%', 'height' => '18%', 'z' => 8],
-            ['left' => '16px', 'bottom' => '52px', 'width' => '22%', 'height' => '18%', 'z' => 8],
-            ['right' => '16px', 'bottom' => '52px', 'width' => '22%', 'height' => '18%', 'z' => 8],
+            ['left' => '10px', 'top' => '10px', 'width' => $itemTotal <= 3 ? '30%' : '26%', 'height' => $itemTotal <= 3 ? '26%' : '22%', 'z' => 10],
+            ['right' => '10px', 'top' => '10px', 'width' => $itemTotal <= 3 ? '30%' : '26%', 'height' => $itemTotal <= 3 ? '26%' : '22%', 'z' => 10],
+            ['left' => '10px', 'bottom' => $hasShoes ? '36px' : '16px', 'width' => '24%', 'height' => '20%', 'z' => 10],
+            ['right' => '10px', 'bottom' => $hasShoes ? '36px' : '16px', 'width' => '24%', 'height' => '20%', 'z' => 10],
         ],
         default => [
-            ['left' => '14px', 'top' => '14px', 'width' => '24%', 'height' => '20%', 'z' => 6],
-            ['right' => '14px', 'top' => '14px', 'width' => '24%', 'height' => '20%', 'z' => 6],
-            ['left' => '14px', 'bottom' => '14px', 'width' => '24%', 'height' => '20%', 'z' => 6],
-            ['right' => '14px', 'bottom' => '14px', 'width' => '24%', 'height' => '20%', 'z' => 6],
+            ['left' => '12px', 'top' => '12px', 'width' => '26%', 'height' => '22%', 'z' => 7],
+            ['right' => '12px', 'top' => '12px', 'width' => '26%', 'height' => '22%', 'z' => 7],
+            ['left' => '12px', 'bottom' => '12px', 'width' => '26%', 'height' => '22%', 'z' => 7],
+            ['right' => '12px', 'bottom' => '12px', 'width' => '26%', 'height' => '22%', 'z' => 7],
         ],
     };
 
@@ -262,7 +290,7 @@ require __DIR__ . '/../includes/header.php';
                     </div>
                     <div class="col-md-4">
                         <label for="modal_image" class="form-label">Image upload</label>
-                        <input type="file" class="form-control" id="modal_image" name="image" accept="image/*">
+                        <input type="file" class="form-control" id="modal_image" name="image" accept="image/*" required>
                         <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" value="1" id="modal_favorite" name="favorite">
                             <label class="form-check-label" for="modal_favorite">Mark as favorite</label>
@@ -404,6 +432,7 @@ require __DIR__ . '/../includes/header.php';
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end wardrobe-dropdown-menu">
                                         <li><a href="edit_clothing.php?id=<?= (int) $item['id'] ?>" class="dropdown-item wardrobe-dropdown-item">Edit Piece</a></li>
+                                        <li><a href="../actions/toggle_favorite.php?id=<?= (int) $item['id'] ?>" class="dropdown-item wardrobe-dropdown-item"><?= (int) ($item['favorite'] ?? 0) === 1 ? 'Remove Favorite' : 'Mark as Favorite' ?></a></li>
                                         <li><a href="../actions/mark_worn.php?id=<?= (int) $item['id'] ?>" class="dropdown-item wardrobe-dropdown-item">Mark as Worn</a></li>
                                         <li><hr class="dropdown-divider wardrobe-dropdown-divider"></li>
                                         <li><a href="../actions/delete_clothing.php?id=<?= (int) $item['id'] ?>" class="dropdown-item wardrobe-dropdown-item wardrobe-dropdown-delete" data-confirm-delete data-confirm-message="<?= htmlspecialchars("Delete \"" . $item['name'] . "\" from your wardrobe? This action cannot be undone.", ENT_QUOTES) ?>">Delete Piece</a></li>
@@ -417,7 +446,9 @@ require __DIR__ . '/../includes/header.php';
                             <span><?= htmlspecialchars($item['occasion']) ?></span>
                             <span><?= $item['last_worn'] ? htmlspecialchars(date('M d, Y', strtotime($item['last_worn']))) : 'Never worn' ?></span>
                         </div>
-                        <p class="wardrobe-note mb-3"><?= htmlspecialchars($item['notes'] ?: 'Ready to style in multiple combinations.') ?></p>
+                        <?php if (!empty($item['notes'])): ?>
+                            <p class="wardrobe-note mb-3"><?= htmlspecialchars($item['notes']) ?></p>
+                        <?php endif; ?>
                     </div>
                 </article>
             <?php endforeach; ?>
@@ -425,19 +456,28 @@ require __DIR__ . '/../includes/header.php';
     </form>
 
     <section class="feature-card mt-4 saved-fits-shell">
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-3 flex-wrap">
+        <div class="saved-fits-shell-header">
             <div>
                 <span class="eyebrow">Saved fits</span>
                 <h3 class="mb-1">Recently created outfit combinations</h3>
+                <p class="text-muted mb-0">A refined archive of your saved outfit edits, ready to revisit, adjust, and rotate back into wear.</p>
+            </div>
+            <div class="saved-fits-summary">
+                <span><?= count($savedOutfits) ?> saved</span>
+                <span><?= count($items) ?> wardrobe pieces</span>
             </div>
         </div>
         <?php if ($savedOutfits === []): ?>
-            <p class="text-muted mb-0">No saved fits yet. Select wardrobe items above and save your first outfit.</p>
+            <div class="saved-fits-empty-state">
+                <span class="mini-label">Fit archive</span>
+                <p class="text-muted mb-0">No saved fits yet. Select wardrobe items above and save your first outfit.</p>
+            </div>
         <?php else: ?>
             <div class="saved-fits-grid">
                 <?php foreach ($savedOutfits as $outfit): ?>
                     <?php
                     $categoryTotals = [];
+                    $layoutContext = summarizeFitLayout($outfit['items']);
                     foreach ($outfit['items'] as $piece) {
                         $key = fitCategoryKey($piece['category']);
                         $categoryTotals[$key] = ($categoryTotals[$key] ?? 0) + 1;
@@ -453,15 +493,22 @@ require __DIR__ . '/../includes/header.php';
                                 $categoryIndex = $categorySeen[$key] ?? 0;
                                 $categorySeen[$key] = $categoryIndex + 1;
                                 ?>
-                                <div class="saved-fit-piece <?= fitPieceClass($piece['category']) ?>" style="<?= htmlspecialchars(fitPieceStyle($piece['category'], $categoryIndex, $categoryTotals[$key] ?? 1, $index)) ?>">
+                                <div class="saved-fit-piece <?= fitPieceClass($piece['category']) ?>" style="<?= htmlspecialchars(fitPieceStyle($piece['category'], $categoryIndex, $categoryTotals[$key] ?? 1, $index, $layoutContext)) ?>">
                                     <img src="<?= htmlspecialchars('../' . ($piece['image_path'] ?: 'assets/uploads/default.png')) ?>" alt="<?= htmlspecialchars($piece['name']) ?>" onerror="this.src='https://placehold.co/500x700/e7eaee/3b434c?text=Fit';">
                                 </div>
                             <?php endforeach; ?>
                         </div>
                         <div class="saved-fit-details">
-                            <span class="mini-label">Saved fit</span>
+                            <div class="saved-fit-detail-top">
+                                <span class="mini-label">Saved fit</span>
+                                <span class="saved-fit-date"><?= htmlspecialchars(date('M d, Y', strtotime($outfit['created_at']))) ?></span>
+                            </div>
                             <h4><?= htmlspecialchars($outfit['name']) ?></h4>
                             <p class="saved-fit-subtitle mb-3"><?= htmlspecialchars($outfit['occasion'] ?: 'Open styling') ?><?= !empty($outfit['season']) ? ' / ' . htmlspecialchars($outfit['season']) : '' ?></p>
+                            <div class="saved-fit-meta-row">
+                                <span><?= (int) ($outfit['item_total'] ?? 0) ?> pieces</span>
+                                <span><?= htmlspecialchars($outfit['season'] ?: 'Flexible season') ?></span>
+                            </div>
                             <div class="saved-fit-actions">
                                 <a href="edit_outfit.php?id=<?= (int) $outfit['id'] ?>" class="saved-fit-action saved-fit-action-edit">Edit Fit</a>
                                 <a href="../actions/delete_outfit.php?id=<?= (int) $outfit['id'] ?>" class="saved-fit-action saved-fit-action-delete" data-confirm-delete data-confirm-message="<?= htmlspecialchars("Delete the saved fit \"" . $outfit['name'] . "\"? This action cannot be undone.", ENT_QUOTES) ?>">Delete Fit</a>

@@ -18,7 +18,6 @@ $rootPrefix = $isPageDir ? '../' : '';
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                 <li class="nav-item"><a class="nav-link" href="<?= $rootPrefix ?>index.php">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= $rootPrefix ?>pages/wardrobe.php">Wardrobe</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= $rootPrefix ?>pages/recommendation.php">Recommendations</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= $rootPrefix ?>pages/wear_history.php">Wear History</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= $rootPrefix ?>pages/insights.php">Insights</a></li>
             </ul>

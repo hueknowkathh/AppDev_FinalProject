@@ -9,6 +9,12 @@ except ImportError:
     cv2 = None
     np = None
 
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    Image = None
+    ImageOps = None
+
 
 COLOR_MAP = {
     "Red": (185, 65, 60),
@@ -20,6 +26,27 @@ COLOR_MAP = {
     "Beige": (214, 194, 160),
     "Pink": (220, 155, 175),
 }
+
+
+def load_image(path):
+    image = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+    if image is not None:
+        return image
+
+    if Image is None or ImageOps is None or np is None:
+        return None
+
+    try:
+        with Image.open(path) as pil_image:
+            pil_image = ImageOps.exif_transpose(pil_image)
+            if pil_image.mode in ('RGBA', 'LA'):
+                rgba = np.array(pil_image.convert('RGBA'))
+                return cv2.cvtColor(rgba, cv2.COLOR_RGBA2BGRA)
+
+            rgb = np.array(pil_image.convert('RGB'))
+            return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+    except Exception:
+        return None
 
 
 def classify_color(rgb):
@@ -130,7 +157,7 @@ def main():
         print(json.dumps({"dominant_color": None, "message": "OpenCV dependencies are not installed."}))
         return
 
-    image = cv2.imread(str(image_path), cv2.IMREAD_UNCHANGED)
+    image = load_image(image_path)
     if image is None:
         print(json.dumps({"dominant_color": None, "message": "Image could not be read."}))
         return

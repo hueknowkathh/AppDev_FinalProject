@@ -103,9 +103,10 @@ function wardrobeRecommendationPrompt(
         '- Always create exactly the requested number of recommendations unless the wardrobe is completely empty.',
         '- If the wardrobe has enough compatible pieces, use mode "items" and include real wardrobe items from the list.',
         '- If the filtered wardrobe does not have enough compatible pieces, use mode "description" and leave items as an empty array while giving a distinct fit concept grounded in the broader wardrobe context.',
+        '- In description mode, you may suggest complementary pieces outside the wardrobe only when needed to complete the outfit, but you must clearly anchor the recommendation to the saved wardrobe pieces first.',
         '- In description mode, still make the recommendations specific, varied, and accurate based on available categories, colors, occasions, and wardrobe patterns.',
         '- Recommendations must be clearly different from each other in styling direction, silhouette, or color approach.',
-        '- Never invent clothing items that are not in the wardrobe list.',
+        '- Never present invented clothing items as if they already exist in the wardrobe list.',
         '- Every outfit must include a wear_guide array explaining what kind of clothes to wear in short stylist instructions.',
         '- Keep reasons concise and helpful.',
         '- The "message" should summarize what was generated for the user.',
@@ -273,6 +274,15 @@ if ($openAiApiKey !== '') {
         echo json_encode(['success' => true, 'result' => $aiResult['parsed']]);
         exit;
     }
+
+    http_response_code(502);
+    echo json_encode([
+        'success' => false,
+        'message' => 'OpenAI styling is configured but the recommendation request failed.',
+        'debug' => $aiResult['message'] ?? 'Unknown OpenAI error.',
+        'engine' => 'openai',
+    ]);
+    exit;
 }
 
 $tempFile = tempnam(sys_get_temp_dir(), 'couture_reco_');

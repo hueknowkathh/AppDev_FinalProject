@@ -4,6 +4,11 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $pageTitle = $pageTitle ?? 'Closet Couture';
+$isPageDir = str_contains($_SERVER['PHP_SELF'], '/pages/');
+$assetPrefix = $isPageDir ? '../' : '';
+$cssRelativePath = 'assets/css/style.css';
+$cssVersionPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $cssRelativePath);
+$cssVersion = is_file($cssVersionPath) ? filemtime($cssVersionPath) : time();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +20,7 @@ $pageTitle = $pageTitle ?? 'Closet Couture';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= str_contains($_SERVER['PHP_SELF'], '/pages/') ? '../assets/css/style.css' : 'assets/css/style.css' ?>" rel="stylesheet">
+    <link href="<?= htmlspecialchars($assetPrefix . $cssRelativePath . '?v=' . $cssVersion) ?>" rel="stylesheet">
 </head>
 <body>
     <div class="page-shell">

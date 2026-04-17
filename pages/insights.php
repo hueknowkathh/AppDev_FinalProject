@@ -12,7 +12,7 @@ $seasonStats = $conn->query('SELECT season, COUNT(*) AS total FROM clothes GROUP
 $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
 ?>
 
-<section class="section-heading">
+<section class="section-heading dashboard-heading">
     <span class="eyebrow">Wardrobe analytics</span>
     <h1>Insights and usage patterns</h1>
     <p class="text-muted">Surface wardrobe health, usage balance, and styling opportunities from the data you collect.</p>
@@ -20,25 +20,25 @@ $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
 
 <div class="row g-4 mb-4">
     <div class="col-md-6 col-xl-3">
-        <div class="metric-card">
+        <div class="metric-card luxury-metric-card insights-top-card">
             <span>Total items</span>
             <h2><?= (int) ($totals['total_items'] ?? 0) ?></h2>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="metric-card">
+        <div class="metric-card luxury-metric-card insights-top-card">
             <span>Favorite items</span>
             <h2><?= (int) ($totals['total_favorites'] ?? 0) ?></h2>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="metric-card">
+        <div class="metric-card luxury-metric-card insights-top-card">
             <span>Never worn items</span>
             <h2><?= count($neverWorn) ?></h2>
         </div>
     </div>
     <div class="col-md-6 col-xl-3">
-        <div class="metric-card">
+        <div class="metric-card luxury-metric-card insights-top-card">
             <span>Tracked categories</span>
             <h2><?= count($categoryStats) ?></h2>
         </div>
@@ -47,7 +47,7 @@ $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
 
 <div class="row g-4">
     <div class="col-lg-6">
-        <div class="feature-card h-100">
+        <div class="feature-card dashboard-feature-card insights-feature-card h-100">
             <span class="mini-label">Most worn</span>
             <h3>Rotation leaders</h3>
             <?php if ($mostWorn === []): ?>
@@ -63,7 +63,7 @@ $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="feature-card h-100">
+        <div class="feature-card dashboard-feature-card insights-feature-card h-100">
             <span class="mini-label">Least worn</span>
             <h3>Pieces to revisit</h3>
             <?php if ($leastWorn === []): ?>
@@ -79,7 +79,7 @@ $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="feature-card h-100">
+        <div class="feature-card dashboard-feature-card insights-feature-card h-100">
             <span class="mini-label">Category distribution</span>
             <h3>Wardrobe composition</h3>
             <?php if ($categoryStats === []): ?>
@@ -101,7 +101,7 @@ $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
         </div>
     </div>
     <div class="col-lg-6">
-        <div class="feature-card h-100">
+        <div class="feature-card dashboard-feature-card insights-feature-card h-100">
             <span class="mini-label">Season distribution</span>
             <h3>Seasonal readiness</h3>
             <?php if ($seasonStats === []): ?>
@@ -123,7 +123,7 @@ $totalItems = max(1, (int) ($totals['total_items'] ?? 0));
         </div>
     </div>
     <div class="col-12">
-        <div class="feature-card">
+        <div class="feature-card dashboard-feature-card insights-feature-card">
             <span class="mini-label">Never worn</span>
             <h3>Items waiting for their first outing</h3>
             <?php if ($neverWorn === []): ?>
